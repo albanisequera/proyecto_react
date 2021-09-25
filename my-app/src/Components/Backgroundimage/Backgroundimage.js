@@ -1,7 +1,8 @@
 import React from 'react';
-import imagen from "../assets/imagen.jpeg";
+import backgroundimage from "../assets/backgroundimage.jpeg";
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Typography } from '@material-ui/core';
+import { Link } from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -9,11 +10,12 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         display: 'flex',
         flexDirection:'column',
-        justifyContent: 'end',
+        justifyContent: 'center',
         alignItems: 'end',
-        backgroundImage: `url(${imagen})`,
+        backgroundImage: `url(${backgroundimage})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
+        
         [theme.breakpoints.up('xs')]: { 
             height: '9rem',
             paddingTop: theme.spacing(8),
@@ -22,28 +24,28 @@ const useStyles = makeStyles((theme) => ({
             marginLeft: theme.spacing(0),
         },
         [theme.breakpoints.up('sm')]: {
-            paddingRight: theme.spacing(2),
+            paddingRight: theme.spacing(0),
             width: '100%',
             height: '9rem',
             paddingTop: theme.spacing(15),
             paddingBottom: theme.spacing(15),
         },
         [theme.breakpoints.up('md')]: {
-            paddingRight: theme.spacing(2),
+            paddingRight: theme.spacing(0),
             width: '100%',
             height: '9rem',
             paddingTop: theme.spacing(20),
             paddingBottom: theme.spacing(20),
         },
         [theme.breakpoints.up('lg')]: {
-            paddingRight: theme.spacing(2),
+            paddingRight: theme.spacing(0),
             paddingTop: theme.spacing(20),
             paddingBottom: theme.spacing(20),
             width: '100%',
             height: '9rem',
         },
         [theme.breakpoints.up('xl')]: {
-            paddingRight: theme.spacing(2),
+            paddingRight: theme.spacing(0),
             paddingTop: theme.spacing(25),
             paddingBottom: theme.spacing(25),
             width: '100%',
@@ -94,9 +96,11 @@ export default function Backgroundimage() {
                         Curso online <br />
                         Aprende con nostros!!!!
                     </Typography>
+                    <Link to='/product'>
                     <Button variant="contained" color="secondary" className={classes.image__button}>
                         <strong>buy</strong>
                     </Button>
+                    </Link>
                 </div>
     );
 }

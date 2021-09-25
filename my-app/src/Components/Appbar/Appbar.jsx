@@ -8,20 +8,26 @@ import { alpha, makeStyles } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import logo from '../assets/logo.png'
-import { Box, Button } from '@material-ui/core';
+import { Badge, Box, Button } from '@material-ui/core';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import { Link, useHistory } from "react-router-dom";
+import { useStateValue } from '../../StateProvider';
+import { auth } from '../../firebase';
+import { actionTypes } from "../../reducer";
+import { ShoppingCart } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
         marginBottom: '6rem',
-        display:'flex',
+        display: 'flex',
     },
-    menuButton: {
-        marginRight: theme.spacing(2),
+    usuario: {
+        paddingTop: theme.spacing(1),
+        paddingRight: theme.spacing(1),
     },
     appbar: {
         backgroundColor: 'whitesmoke',
@@ -73,21 +79,32 @@ const useStyles = makeStyles((theme) => ({
             },
         },
     },
-    grow: {
-        flexGrow: 1,
-    },
     button: {
         marginLeft: theme.spacing(2),
     },
     image: {
         marginRight: '5px',
         height: '4rem',
-        width: '8rem',
+        width: '9rem',
     },
 }));
 
 export default function Appbar() {
     const classes = useStyles();
+
+    const [{ basket, user }, dispatch] = useStateValue();
+    const history = useHistory();
+
+    const handleAuth = () => {
+        if (user) {
+            auth.signOut();
+            dispatch({
+                type: actionTypes.EMPTY_BASKET,
+                basket: [],
+            });
+            history.push("/");
+        }
+    };
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -150,32 +167,27 @@ export default function Appbar() {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
         >
-            <MenuItem>
+            <MenuItem onClick={handleMenuClose}>
                 <Typography variant='h6' color='textPrimary' component='p'>
-                    Hello Guest
+                    Hello {user ? user.email : "Guest"}
                 </Typography>
             </MenuItem>
-            <MenuItem>
-                <Button variant='outlined'>
-                    <strong>Registro</strong>
-                </Button>
+            <MenuItem onClick={handleMenuClose}>
+                <Link to={!user && "/signin"}>
+                    <Button onClick={handleAuth} variant='outlined'>
+                        <strong>{user ? "Sign Out" : "Sign In"}</strong>
+                    </Button>
+                </Link>
             </MenuItem>
-            <MenuItem>
-                <Button variant='outlined'>
-                    <strong>Login</strong>
-                </Button>
-            </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
-                <IconButton
-                    size="large"
-                    aria-label="account of current user"
-                    aria-controls="primary-search-account-menu"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle />
-                </IconButton>
-                <p>Profile</p>
+            
+            <MenuItem onClick={handleMenuClose}>
+            <Link to='/checkout-page'>
+              <IconButton aria-label='show cart items' color='inherit'>
+                <Badge badgeContent={basket?.length} color='secondary'>
+                  <ShoppingCart fontSize='large' color='primary' />
+                </Badge>
+              </IconButton>
+            </Link>
             </MenuItem>
         </Menu>
     );
@@ -183,57 +195,36 @@ export default function Appbar() {
     return (
         <div className={classes.root}>
             <Box sx={{ flexGrow: 1 }}>
-
                 <AppBar position="fixed" className={classes.appbar}>
                     <Toolbar>
-                        <IconButton
-                            edge="start"
-                            size="large"
-                            className={classes.menuButton}
-                            color="primary"
-                            aria-label="open drawer"
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                            <img src={logo} alt="logo" className={classes.image} />
-                        </IconButton>
+                        <Link to='/'>
+                            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                                <img src={logo} alt="logo" className={classes.image} />
+                            </IconButton>
+                        </Link>
                         <div className={classes.search}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon />
-                            </div>
-                            <InputBase
-                                placeholder="Search…"
-                                classes={{
-                                    root: classes.inputRoot,
-                                    input: classes.inputInput,
-                                }}
-                                inputProps={{ 'aria-label': 'search' }}
-                            />
                         </div>
                         <Box sx={{ flexGrow: 1 }} />
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                            <Typography variant='h6' color='textPrimary' component='p'>
-                                Hello Guest
-                            </Typography>
-                            <Button size="large" color="primary">
-                                Registro
-                            </Button>
-                            <Button size="large" color="primary">
-                                Login
-                            </Button>
-                            <IconButton
-                                size="large"
-                                edge="end"
-                                aria-label="account of current user"
-                                aria-controls={menuId}
-                                aria-haspopup="true"
-                                onClick={handleProfileMenuOpen}
-                                color="primary"
-                            >
-                                <AccountCircle />
-                            </IconButton>
+                            <div className={classes.usuario}>
+                                <Typography variant='h6' color='textPrimary' component='p'>
+                                    Hello {user ? user.email : "Guest"}
+                                </Typography>
+                            </div>
+                            <div className={classes.usuario}>
+                            <Link to={!user && "/signin"}>
+                                <Button onClick={handleAuth} variant='outlined'>
+                                    <strong>{user ? "Sign Out" : "Sign In"}</strong>
+                                </Button>
+                            </Link>
+                            </div>
+                            <Link to='/checkout-page'>
+                                <IconButton aria-label='show cart items' color='inherit'>
+                                    <Badge badgeContent={basket?.length} color='secondary'>
+                                        <ShoppingCart fontSize='large' color='primary' />
+                                    </Badge>
+                                </IconButton>
+                            </Link>
                         </Box>
                         <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                             <IconButton
